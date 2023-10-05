@@ -14,10 +14,9 @@ def fetch_data(ticker, start_date, end_date):
     latest_data = data.iloc[-1]
     return latest_data
 
-# Modify the predict_price function to accept 'steps' as an argument
-def predict_price(ticker, steps=1):
+def predict_price(ticker, start_date, end_date, steps=1):
     ticker = ticker.upper()
-    latest_data = fetch_data(ticker)
+    latest_data = fetch_data(ticker, start_date, end_date)
     opening_price = latest_data['Open']
     high_price = latest_data['High']
     low_price = latest_data['Low']
