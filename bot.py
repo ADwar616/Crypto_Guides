@@ -14,7 +14,8 @@ def fetch_data(ticker):
     latest_data = data.iloc[-1]
     return latest_data
 
-def predict_price(ticker):
+# Modify the predict_price function to accept 'steps' as an argument
+def predict_price(ticker, steps=1):
     ticker = ticker.upper()
     latest_data = fetch_data(ticker)
     opening_price = latest_data['Open']
@@ -37,7 +38,7 @@ def predict_price(ticker):
     columns = ['Open', 'High', 'Low', 'Adj Close', 'Volume', 'Year', 'Month', 'Day']
     input_data = pd.DataFrame([user_data], columns=columns)
 
-    forecast = arima_model.get_forecast(steps=1)
+    forecast = arima_model.get_forecast(steps=steps)  
     predicted_residuals = forecast.predicted_mean
     predicted_close = adj_closing_price + predicted_residuals.values[0]
 
