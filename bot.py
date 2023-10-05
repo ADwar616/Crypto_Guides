@@ -43,37 +43,33 @@ def predict_price(ticker):
 
     return predicted_close
 
-def sma_strategy(ticker, short_window, long_window):
-    data = yf.download(ticker, period="1d", interval="1d")
-    data['SMA_Short'] = data['Adj Close'].rolling(window=short_window).mean()
-    data['SMA_Long'] = data['Adj Close'].rolling(window=long_window).mean()
-    last_short_sma = data['SMA_Short'].iloc[-1]
-    last_long_sma = data['SMA_Long'].iloc[-1]
-
-    if last_short_sma > last_long_sma:
-        return 'Buy'
-    elif last_short_sma < last_long_sma:
-        return 'Sell'
-    else:
-        return 'Hold'
-
-# Streamlit UI
 def main():
-    st.title("Stock Price Prediction App")
+    st.title("Stock Price Prediction and Analysis App")
 
     ticker = st.text_input("Enter the ticker symbol (e.g., BTC-USD, ETH-USD, LTC-USD):")
 
+    date_range = st.date_input("Select a date range:", value=(pd.Timestamp('2022-01-01'), pd.Timestamp.today()))
+
+    short_window = st.number_input("Short SMA Window:", value=10, min_value=1)
+    long_window = st.number_input("Long SMA Window:", value=50, min_value=1)
+
+    prediction_steps = st.number_input("Prediction Steps (ARIMA):", value=1, min_value=1)
+
+    show_current_price = st.checkbox("Show Current Price")
+    show_predicted_price = st.checkbox("Show Predicted Price")
+    show_sma_analysis = st.checkbox("Show SMA Analysis")
+
     if st.button("Predict"):
         if ticker:
-            predicted_closing_price = predict_price(ticker)
-            current_price = fetch_data(ticker)['Adj Close']
-            st.write(f"Current Price for {ticker}:", current_price)
-            st.write(f"Predicted Closing Price for {ticker}:", predicted_closing_price)
-
-            short_window = 10
-            long_window = 50
-            decision = sma_strategy(ticker, short_window, long_window)
-            st.write(f"Trading Decision for {ticker}:", decision)
+            predicted_closing_price = predict_price(ticker, steps=prediction_steps)
+            if show_current_price:
+                current_price = fetch_data(ticker, start_date=date_range[0], end_date=date_range[1])['Adj Close']
+                st.write(f"Current Price for {ticker}:", current_price)
+            if show_predicted_price:
+                st.write(f"Predicted Closing Price for {ticker}:", predicted_closing_price)
+            if show_sma_analysis:
+                decision = sma_strategy(ticker, short_window, long_window)
+                st.write(f"Trading Decision for {ticker}:", decision)
 
 # Execute the Streamlit app
 if __name__ == '__main__':
