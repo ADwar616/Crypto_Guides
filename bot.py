@@ -9,8 +9,8 @@ import streamlit as st
 arima_model = joblib.load('arima_model.joblib')
 
 # Define functions for data fetching and prediction
-def fetch_data(ticker):
-    data = yf.download(ticker, period="1d", interval="1m")
+def fetch_data(ticker, start_date, end_date):
+    data = yf.download(ticker, start=start_date, end=end_date)
     latest_data = data.iloc[-1]
     return latest_data
 
