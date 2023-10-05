@@ -77,7 +77,8 @@ def main():
 
     if st.button("Predict"):
         if ticker:
-            predicted_closing_price = predict_price(ticker, steps=prediction_steps)
+            # Pass start_date and end_date to predict_price
+            predicted_closing_price = predict_price(ticker, date_range[0], date_range[1], steps=prediction_steps)
             if show_current_price:
                 current_price = fetch_data(ticker, start_date=date_range[0], end_date=date_range[1])['Adj Close']
                 st.write(f"Current Price for {ticker}:", current_price)
