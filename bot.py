@@ -44,6 +44,22 @@ def predict_price(ticker, steps=1):
 
     return predicted_close
 
+# Define the SMA strategy function
+def sma_strategy(ticker, short_window, long_window):
+    data = yf.download(ticker, period="1d", interval="1d")
+    data['SMA_Short'] = data['Adj Close'].rolling(window=short_window).mean()
+    data['SMA_Long'] = data['Adj Close'].rolling(window=long_window).mean()
+    last_short_sma = data['SMA_Short'].iloc[-1]
+    last_long_sma = data['SMA_Long'].iloc[-1]
+
+    if last_short_sma > last_long_sma:
+        return 'Buy'
+    elif last_short_sma < last_long_sma:
+        return 'Sell'
+    else:
+        return 'Hold'
+
+# Streamlit UI with user inputs
 def main():
     st.title("Stock Price Prediction and Analysis App")
 
