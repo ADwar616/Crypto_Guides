@@ -43,6 +43,20 @@ def predict_price(ticker):
 
     return predicted_close
 
+def sma_strategy(ticker, short_window, long_window):
+    data = yf.download(ticker, period="1d", interval="1d")
+    data['SMA_Short'] = data['Adj Close'].rolling(window=short_window).mean()
+    data['SMA_Long'] = data['Adj Close'].rolling(window=long_window).mean()
+    last_short_sma = data['SMA_Short'].iloc[-1]
+    last_long_sma = data['SMA_Long'].iloc[-1]
+
+    if last_short_sma > last_long_sma:
+        return 'Buy'
+    elif last_short_sma < last_long_sma:
+        return 'Sell'
+    else:
+        return 'Hold'
+
 # Streamlit UI
 def main():
     st.title("Stock Price Prediction App")
@@ -52,8 +66,14 @@ def main():
     if st.button("Predict"):
         if ticker:
             predicted_closing_price = predict_price(ticker)
-            st.write(f"Current Price for {ticker}:", fetch_data(ticker)['Adj Close'])
+            current_price = fetch_data(ticker)['Adj Close']
+            st.write(f"Current Price for {ticker}:", current_price)
             st.write(f"Predicted Closing Price for {ticker}:", predicted_closing_price)
+
+            short_window = 10
+            long_window = 50
+            decision = sma_strategy(ticker, short_window, long_window)
+            st.write(f"Trading Decision for {ticker}:", decision)
 
 # Execute the Streamlit app
 if __name__ == '__main__':
